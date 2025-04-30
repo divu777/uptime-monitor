@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String @id @default(uuid())
+  email String @unique
+  // websites Website[]
+}
+
+model Website {
+  id            String        @id @default(uuid())
+  url           String
+  /**
+   * user User @relation(fields: [userId], references: [id]) - the reason is
+   * because we are using clerk and based on that we have to make webhook that as soon as clerk
+   * sign up we add the user
+   */
+  userId        String        
+  website_ticks WebsiteTick[]
+  disabled      Boolean       @default(false)
+}
+
+model Validator {
+  id           String       @id @default(uuid())
+  public_key   String
+  location     String
+  ip           String
+  pending_payouts Int     @default(0)
+  website_tick WebsiteTick[]
+}
+
+model WebsiteTick {
+  id          String        @id @default(uuid())
+  websiteId   String        
+  website     Website       @relation(fields: [websiteId], references: [id])
+  validatorId String        
+  validator   Validator     @relation(fields: [validatorId], references: [id] )
+  createdAt   DateTime      @default(now()) 
+  status      WebsiteStatus
+  latency     Float
+}
+
+enum WebsiteStatus {
+  Good
+  Bad
+}

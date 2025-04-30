@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "prettier": "^3.5.3",
-    "turbo": "^2.5.1",
+    "turbo": "^2.4.4",
     "typescript": "5.8.2"
   },
   "engines": {
@@ -20,5 +20,11 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "next": "^15.3.1",
+    "prisma": "^6.6.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
 }
