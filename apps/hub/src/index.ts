@@ -19,7 +19,7 @@ const availableValidators:{
 const COST_PER_VALIDATION=100
 
 Bun.serve({
-  port:4000,
+  port:8081,
   fetch(req, server) {
     if (server.upgrade(req)) {
       return; 
@@ -31,12 +31,14 @@ Bun.serve({
     // where we get the message - tbh
   async message(ws:ServerWebSocket<unknown>, message:string) {
     const data:IncomingMessage=JSON.parse(message);
+
     if(data.type=="signup"){
       const validate=await verifyMessage(
-        `Signed Message for ${data.data.callbackId} ${data.data.public_key}`,
+        `Signed message for ${data.data.callbackId}, ${data.data.public_key}`,
         data.data.public_key,
-        data.data.ip
+        data.data.signature
       );
+
 
       if(validate){
         await signUpHandler(ws,data.data)
@@ -48,11 +50,10 @@ Bun.serve({
   },
   
     
-    close(ws, code, message) {
+    close(ws:ServerWebSocket<unknown> ) {
       availableValidators.splice(availableValidators.findIndex(v=>v.socket==ws),1);
     }, // a socket is closed
 
-    drain(ws) {}, // the socket is ready to receive more data // handlers
   }
 });
 
@@ -75,9 +76,10 @@ const signUpHandler=async(ws:ServerWebSocket<unknown>,{public_key,signature,ip,c
 
     ws.send(JSON.stringify(data));
 
-    availableValidators.push({validatorId:validatorExist.id,socket:ws,public_key})
+    availableValidators.push({validatorId:validatorExist.id,socket:ws,public_key:validatorExist.public_key})
     return;
-  }else{
+  }
+
     const result=await prisma.validator.create({
       data:{
         public_key,
@@ -94,11 +96,12 @@ const signUpHandler=async(ws:ServerWebSocket<unknown>,{public_key,signature,ip,c
       }
     }))
 
-    availableValidators.push({validatorId:result.id,socket:ws,public_key})
-  }
+    availableValidators.push({validatorId:result.id,socket:ws,public_key:result.public_key})
+  
 }
 
 const verifyMessage=async(message:string,public_key:string,signature:string)=>{
+
   const messageBytes = nacl_util.decodeUTF8(message);
     const result = nacl.sign.detached.verify(
         messageBytes,
@@ -114,15 +117,21 @@ const verifyMessage=async(message:string,public_key:string,signature:string)=>{
 
 setInterval(async() => {
 
-  try{
+  
       const websites=await prisma.website.findMany({
         where:{
           disabled:false
         }
       });
-      websites.forEach((website)=>{
-        availableValidators.forEach((validator)=>{
-          const callbackId=randomUUIDv7();
+
+      console.log("yeh rhi websites   "+ websites);
+      for(const website of websites){
+        console.log("validatorrrr   "+ availableValidators);
+        for(const validator of availableValidators){
+          console.log("validaa  "+ JSON.stringify(validator))
+          const callbackId= randomUUIDv7();
+          console.log(`Sending validate to ${validator.validatorId} ${website.url}`);
+
           validator.socket.send(JSON.stringify({
             type:"validate",
             data:{
@@ -135,9 +144,9 @@ setInterval(async() => {
 
 
           globalObj[callbackId]=async(data:IncomingMessage)=>{
-            if(data.type=="validate"){
+            if(data.type==="validate"){
               const {validatorId,signedMessage,latency,status,websiteId}=data.data
-
+              console.log(JSON.stringify(data)+ "   tick walla data")
               const verified=await verifyMessage(
                 `Replying to ${callbackId}`,
                 validator.public_key,
@@ -174,12 +183,10 @@ setInterval(async() => {
 
             }
           }
-        })
-      })
+        }
+      }
     
 
-  }catch(err){
-    console.log(err+"in sending the websites to validators")
-  }
+ 
   
 }, 30000);
