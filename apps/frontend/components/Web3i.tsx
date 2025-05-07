@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Clock, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 
 type StatusType = "online" | "offline" | "degraded" | "loading";

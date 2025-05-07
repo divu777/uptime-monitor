@@ -28,7 +28,7 @@ const AddWebsiteModal: React.FC<AddWebsiteModalProps> = ({ isOpen, onClose, onAd
       setUrl('');
       setError('');
       onClose();
-    } catch (err) {
+    } catch {
       setError('Please enter a valid URL (e.g., https://example.com)');
     }
   };

@@ -23,7 +23,6 @@ import {
 import { Web3StatusIndicator } from './Web3StatusIndicator';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from 'next-themes';
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
@@ -36,7 +35,6 @@ const navLinks = [
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { theme } = useTheme();
   
   // Handle scroll effect
   useEffect(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Web3StatusIndicator } from "@/components/Web3i";
 import { ParallaxSection, FadeInView } from "@/components/ParallaxWrapper";
 
