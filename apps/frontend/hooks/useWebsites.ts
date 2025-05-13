@@ -15,7 +15,7 @@ export type Website={
     website_ticks:{
         id:string,
         createdAt:string,
-        status:WebsiteStatus,
+        status:'Good'|'Bad',
         latency:number
     }[]
 }

@@ -32,7 +32,7 @@ const Dashboard: React.FC = () => {
 
       console.log(result.data.message??"added website successfully")
 
-    }catch{
+    }catch(err){
       console.log(err)
     }
     console.log('Adding website:', url);

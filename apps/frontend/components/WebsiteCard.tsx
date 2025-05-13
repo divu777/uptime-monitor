@@ -49,7 +49,7 @@ const WebsiteCard: React.FC<WebsiteCardProps> = ({ website }) => {
           start: thirtyMinutesAgo,
           end: now
         });
-      } catch (error) {
+      } catch  {
         console.error('Invalid date:', tick.createdAt);
         return false;
       }
@@ -68,7 +68,7 @@ const WebsiteCard: React.FC<WebsiteCardProps> = ({ website }) => {
             start: windowStart,
             end: windowEnd
           });
-        } catch (error) {
+        } catch {
           console.error('Invalid date in window check:', tick.createdAt);
           return false;
         }
